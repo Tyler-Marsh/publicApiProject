@@ -1,14 +1,19 @@
+
+// variable to insert users into and 
+const gallery = document.getElementById("gallery");
+
+
+
+
 // async await code
 // url: https://randomuser.me/api/?results=12
-
-// variable to insert users into
-const gallery = document.getElementById("gallery");
 // create the container
 //document.body.appendChild(modalCont);
 async function getRandoms() {
   // wrap in try catch
+  //?nat=gb,us,ir
   try { 
-    let response = await fetch('https://randomuser.me/api/?results=12');
+    let response = await fetch('https://randomuser.me/api/?results=12&nat=gb,us,ca');
     
     let resJson = await response.json();
     let personArray = await resJson.results;
@@ -178,8 +183,6 @@ function nextEventListener(element, index) {
 }
 
 
-
-
 // make a function to add an event listener to each .card
 
 // query selector all to add the event listeners
@@ -187,3 +190,75 @@ function nextEventListener(element, index) {
 // when the event listener is called it will get the queryselector all
 // test .click() in the browser
 // const deck = document.querySelectorAll('.card')
+
+
+/* SEARCH FROM FOR FILTERING THE RESULTS */
+
+const searchForm = document.createElement('form');
+searchForm.method = "get";
+searchForm.action = "#";
+
+const search = createElem("input", "search-input", null, "search-input");
+search.type = "search";
+search.placeholder = "Search...";
+
+const submit = createElem("input", "search-submit", null, "search-submit");
+submit.type = "submit";
+submit.value = "🔍";
+// added an alternative magnifying glass
+// from https://html-css-js.com/html/character-codes/icons/
+
+// append the inputs to the form
+searchForm.appendChild(search);
+searchForm.appendChild(submit);
+
+// add search form to the page.
+document.querySelector('.search-container').appendChild(searchForm);
+
+
+// prevent default event of the form
+// call the filtering function
+searchForm.addEventListener("submit", event => {
+  event.preventDefault();
+  console.log("submit");
+})
+
+const searchFilter = document.getElementById('search-input');
+
+searchFilter.addEventListener('keyup',(event) => {
+  event.preventDefault();
+  const value = document.getElementById('search-input').value;
+  isSearchBlank(value);
+  filterResults(value);
+});
+
+// add these functions to the event listener on the form
+// on key up
+function isSearchBlank(value) {
+  if (value === '' || value === null) {
+    return
+  }
+  else {
+    const deck = document.querySelectorAll('.card');
+    for (let i = 0; i < deck.length; i++) {
+      deck[i].style.display = 'flex';
+    }
+  }
+}
+
+function filterResults(value) {
+  const deck = document.querySelectorAll('.card');
+  // match starting value up to any combination after
+  // or exactly the match so the full name can be searched
+  const forRegex = "^" + value + ".+|" + value;
+  const reg = new RegExp(forRegex, 'i');
+  for (let i = 0; i < deck.length; i++) {
+    let testName = deck[i].querySelector('.card-name').innerText
+    if (reg.test(testName)) {
+      deck[i].style.display = 'flex';
+    }
+    else {
+      deck[i].style.display = 'none';
+    }
+  }
+}
